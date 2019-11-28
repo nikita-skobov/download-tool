@@ -1,0 +1,19 @@
+{
+  "name": "book_downloader",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "cli-table": "^0.3.1",
+    "prompts": "^2.3.0",
+    "request": "^2.88.0",
+    "tty-table": "^2.8.2"
+  }
+}
