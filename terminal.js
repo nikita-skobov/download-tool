@@ -30,6 +30,11 @@ function printTableData(data, header = defaultHeader) {
         }
 
         data.forEach((obj, ind) => {
+            if (obj.asRow) {
+                newList.push(obj.asRow)
+                return null
+            }
+
             const row = [
                 ind+1,
                 `${obj.author}\n${obj.publisher}\n${obj.year}`,
