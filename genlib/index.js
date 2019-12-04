@@ -7,6 +7,7 @@ const {
     printTableData,
     pickFromTable,
     afterDownload,
+    checkPath,
 } = require('../terminal')
 
 const {
@@ -116,6 +117,9 @@ function responseHandler(response, existingData, query, data) {
             existingData[query] = data
             const newQuery = await getQuery()
             await programLoop(newQuery, existingData)
+        } else if (response.next === 'change') {
+            await checkPath()
+            await afterDownload(data, query, existingData, responseHandler)
         }
         res()
     })

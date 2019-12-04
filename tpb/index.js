@@ -7,6 +7,7 @@ const {
     printTableData,
     pickFromTable,
     afterDownload,
+    checkPath,
 } = require('../terminal')
 
 const {
@@ -94,6 +95,9 @@ function responseHandler(response, existingData, query, data) {
             existingData[query] = data
             const newQuery = await getQuery()
             await programLoop(newQuery, existingData)
+        } else if (response.next === 'change') {
+            await checkPath()
+            await afterDownload(data, query, existingData, responseHandler)
         }
         res()
     })
@@ -113,7 +117,7 @@ async function programLoop(query, existingData) {
         if (has.call(existingData, query)) {
             printTableData(existingData[query], defaultHeader)
                 .then(pickFromTable)
-                .then(verifyDownload)
+                .then(obj => verifyDownload(obj))
                 .then(data => afterDownload(data, query, existingData, responseHandler))
                 .then(res)
                 .catch(err => rej(err))
@@ -123,7 +127,7 @@ async function programLoop(query, existingData) {
                 .then(getTableData)
                 .then(data => printTableData(data, defaultHeader))
                 .then(pickFromTable)
-                .then(verifyDownload)
+                .then(obj => verifyDownload(obj))
                 .then(data => afterDownload(data, query, existingData, responseHandler))
                 .then(res)
                 .catch(err => rej(err))

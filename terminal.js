@@ -13,6 +13,31 @@ async function getQuery() {
     return actualQuery
 }
 
+async function checkPath() {
+    let outputPath = process.cwd()
+    let pathChanged = false
+    let response
+
+    while (!pathChanged) {
+        response = await prompts([
+            {
+                type: 'text',
+                name: 'path',
+                message: 'Is this download path ok?\n',
+                initial: outputPath,
+            }
+        ])
+        try {
+            process.chdir(response.path)
+            pathChanged = true
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    return response.path
+}
+
 const defaultHeader = [
     { value: 'index', width: 10, headerAlign: 'left' },
     { value: 'Author\nPublisher\nYear', width: 20, headerAlign: 'left' },
@@ -81,6 +106,7 @@ async function pickFromTable(data) {
 
 const defaultChoices = [
     { title: 'Exit', value: 'exit' },
+    { title: 'Change download folder', value: 'change' },
     { title: 'Back to table', value: 'back' },
     { title: 'New search', value: 'new' },
 ]
@@ -113,4 +139,5 @@ module.exports = {
     printTableData,
     pickFromTable,
     afterDownload,
+    checkPath,
 }
