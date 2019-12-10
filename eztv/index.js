@@ -29,12 +29,21 @@ function getTableData(doc) {
         const size = td.eq(3).text()
         const uploaded = td.eq(4).text()
         const seeders = td.eq(5).text()
+
+        const magnet = td.eq(2).find('a.magnet').attr('href')
+        let torrentId = magnet.substr(magnet.indexOf(':') + 1)
+        torrentId = torrentId.substr(torrentId.indexOf(':') + 1)
+        torrentId = torrentId.substr(torrentId.indexOf(':') + 1)
+        torrentId = torrentId.substr(0, torrentId.indexOf('&'))
+
+
         output.push({
             title,
             size,
             uploaded,
             seeders,
             torrentUrl,
+            torrentId,
             asRow: [
                 output.length+1,
                 `${title}\n${uploaded}`,
@@ -55,9 +64,9 @@ function verifyDownload({ selected, data }) {
             return res(data)
         }
 
-        const { torrentUrl } = selected
+        const { torrentUrl, torrentId } = selected
 
-        const defaultFileName = torrentUrl.substr(torrentUrl.lastIndexOf('/') + 1)
+        const defaultFileName = `${torrentId}.torrent`
 
         const response = await prompts([
             {
