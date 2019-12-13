@@ -1,5 +1,7 @@
 const prompts = require('prompts')
 
+const { spawnSync } = require('child_process')
+
 const has = Object.prototype.hasOwnProperty
 
 const {
@@ -61,6 +63,16 @@ function getTableData(doc) {
     return output
 }
 
+function downloadMagnetAsTorrent(magnet, filename) {
+    return new Promise((res, rej) => {
+        spawnSync(`Magnet_to_torrent -m "${magnet}" -o ${filename}`, {
+            stdio: 'inherit',
+            shell: true,
+        })
+        res()
+    })
+}
+
 
 function verifyDownload({ selected, data }) {
     return new Promise(async (res, rej) => {
@@ -70,8 +82,6 @@ function verifyDownload({ selected, data }) {
         }
     
         const defaultFileName = `${selected.torrentId}.torrent`
-        const url = `https://itorrents.org/torrent/${defaultFileName}`
-
         const response = await prompts([
             {
                 type: 'text',
@@ -80,9 +90,10 @@ function verifyDownload({ selected, data }) {
                 initial: defaultFileName,
             }
         ])
-        downloadFile(url, response.filename)
+
+        downloadMagnetAsTorrent(selected.magnet, response.filename)
             .then(() => res(data))
-            .catch((err) => rej({ err, data }))
+            .catch((err) => rej({ err, data}))
     })
 }
 
