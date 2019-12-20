@@ -12,13 +12,13 @@ async function test() {
         return null
     }
     const downloadPath = await checkPath()
-    const program = process.argv.slice(2)[0]
+    const [program, altDomain] = process.argv.slice(2)
 
     const {
         programMain,
     } = require(`./${program}`)
     
-    programMain(downloadPath)
+    programMain(downloadPath, altDomain)
 }
 
 process.on('SIGINT', () => {

@@ -21,6 +21,7 @@ const {
     get,
 } = require('../requests')
 
+let domain = 'thepiratebay.org'
 
 function getTableData(doc) {
     const output = []
@@ -35,11 +36,19 @@ function getTableData(doc) {
         let size = desc.substr(desc.indexOf('Size')).substr(5) // remove 'Size: '
         size = size.substr(0, size.indexOf(','))
 
-        const magnet = td.eq(1).find('a[title="Download this torrent using magnet"]').attr('href')
-        let torrentId = magnet.substr(magnet.indexOf(':') + 1)
-        torrentId = torrentId.substr(torrentId.indexOf(':') + 1)
-        torrentId = torrentId.substr(torrentId.indexOf(':') + 1)
-        torrentId = torrentId.substr(0, torrentId.indexOf('&'))
+        let magnet
+        let torrentId
+
+        try {
+            magnet = td.eq(1).find('a[title="Download this torrent using magnet"]').attr('href')
+            torrentId = magnet.substr(magnet.indexOf(':') + 1)
+            torrentId = torrentId.substr(torrentId.indexOf(':') + 1)
+            torrentId = torrentId.substr(torrentId.indexOf(':') + 1)
+            torrentId = torrentId.substr(0, torrentId.indexOf('&'))
+        } catch (e) {
+            magnet = 'could not parse'
+            torrentId = 'could not parse'
+        }
 
         output.push({
             author,
@@ -133,7 +142,7 @@ async function programLoop(query, existingData) {
                 .then(res)
                 .catch(err => rej(err))
         } else {
-            get(`https://thepiratebay.org/search/${query}/0/99/0`)
+            get(`https://${domain}/search/${query}/0/99/0`)
                 .then(({ body }) => loadFromBody(body))
                 .then(getTableData)
                 .then(data => printTableData(data, defaultHeader))
@@ -146,7 +155,8 @@ async function programLoop(query, existingData) {
     })
 }
 
-async function programMain() {
+async function programMain(downloadPath, altDomain) {
+    if (altDomain) domain = altDomain
     const searchQuery = await getQuery()
     
     const actualQuery = searchQuery.split(' ').reduce((prev, current) => `${prev}+${current}`)
